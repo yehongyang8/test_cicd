@@ -1,0 +1,49 @@
+{
+  "button": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "submit": "Submit",
+    "reset": "Reset",
+    "search": "Search",
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "export": "Export",
+    "import": "Import",
+    "login": "Login",
+    "logout": "Logout",
+    "back": "Back"
+  },
+  "label": {
+    "username": "Username",
+    "password": "Password",
+    "email": "Email",
+    "phone": "Phone",
+    "role": "Role",
+    "status": "Status",
+    "createTime": "Create Time",
+    "updateTime": "Update Time",
+    "operation": "Operation",
+    "remark": "Remark"
+  },
+  "placeholder": {
+    "input": "Please enter {{field}}",
+    "select": "Please select {{field}}",
+    "search": "Please enter search keywords"
+  },
+  "message": {
+    "success": "Operation successful",
+    "error": "Operation failed",
+    "loading": "Loading...",
+    "confirm": "Confirm this operation?",
+    "deleteConfirm": "Confirm delete this item?",
+    "noData": "No data"
+  },
+  "validation": {
+    "required": "{{field}} is required",
+    "email": "Please enter a valid email",
+    "phone": "Please enter a valid phone number",
+    "password": "Password must be at least 6 characters"
+  }
+}
