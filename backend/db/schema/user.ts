@@ -100,6 +100,6 @@ export type QueryUserDTO = z.infer<typeof QueryUserDTO>;
  * 将实体转换为 VO
  */
 export function toUserVO(entity: UserEntity): UserVO {
-  const { password, deleteTime, ...vo } = entity;
+  const { ...vo } = entity;
   return vo;
 }

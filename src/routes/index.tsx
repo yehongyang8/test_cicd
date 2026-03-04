@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 // 🛣️ 路由表定义
 
 import { lazy } from 'react'

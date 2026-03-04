@@ -45,7 +45,7 @@ export interface IUserListParams extends IPaginationParams {
 /**
  * 用户列表响应
  */
-export interface IUserListResponse extends TApiResponse<IPaginationResponse<IUserInfo>> {}
+export type IUserListResponse = TApiResponse<IPaginationResponse<IUserInfo>>
 
 /**
  * 用户信息

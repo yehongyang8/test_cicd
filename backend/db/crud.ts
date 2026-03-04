@@ -1,7 +1,6 @@
 /**
  * 通用 CRUD 封装（含审计与软删除）
  */
-import { Database } from 'sql.js';
 import { getDatabase } from './index';
 import { getRequestUser } from '../lib/request-context';
 

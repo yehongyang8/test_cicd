@@ -8,7 +8,6 @@ import {
   DollarOutlined,
   RiseOutlined,
 } from '@ant-design/icons'
-import { useTranslation } from 'react-i18next'
 import { useMount } from 'ahooks'
 import styled from 'styled-components'
 import type { ColumnsType } from 'antd/es/table'
@@ -59,8 +58,6 @@ interface IRecentActivity {
 }
 
 export default observer(function DashboardPage() {
-  const { t } = useTranslation()
-
   useMount(() => {
     console.log('Dashboard mounted')
   })

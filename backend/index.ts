@@ -9,6 +9,7 @@ import { authMiddleware } from './middleware/auth.middleware';
 import * as authController from './controllers/auth.controller';
 import * as userController from './controllers/user.controller';
 import { clearRequestContext } from './lib/request-context';
+import { AuthService } from './services/auth.service'
 
 /**
  * API 请求接口
@@ -95,7 +96,7 @@ class MockBackend {
       let result;
       if (path === '/api/auth/userInfo' && token) {
         // 特殊处理：从 token 中解析 userId
-        const user = require('./services/auth.service').AuthService.parseToken(token);
+        const user = AuthService.parseToken(token);
         result = await handler(requestData, user?.id);
       } else {
         result = await handler(requestData);

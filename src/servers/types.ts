@@ -13,6 +13,7 @@ export interface IHttpClientConfig extends AxiosRequestConfig {
 /**
  * HTTP 响应
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface IHttpResponse<T = any> extends AxiosResponse<T> {}
 
 /**

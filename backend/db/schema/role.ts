@@ -73,6 +73,6 @@ export type UpdateRoleDTO = z.infer<typeof UpdateRoleDTO>;
  * 将实体转换为 VO
  */
 export function toRoleVO(entity: RoleEntity): RoleVO {
-  const { deleteTime, ...vo } = entity;
+  const { ...vo } = entity;
   return vo;
 }

@@ -103,7 +103,7 @@ export class UserStore {
         })
         return { success: false, message: response.data.message || '登录失败' }
       }
-    } catch (error) {
+    } catch {
       runInAction(() => {
         this.isLoading = false
       })
