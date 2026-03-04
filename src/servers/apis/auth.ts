@@ -1,6 +1,7 @@
 // 🔐 认证相关 API
 
 import { httpClient } from '../client'
+import type { AxiosResponse } from 'axios'
 import type { TApiResponse } from '@/types'
 
 /**
@@ -35,17 +36,13 @@ export interface ILoginResponse {
  */
 export function login(
   data: ILoginParams
-): Promise<TApiResponse<ILoginResponse>> {
+): Promise<AxiosResponse<TApiResponse<ILoginResponse>>> {
   return httpClient.post<TApiResponse<ILoginResponse>>('/api/auth/login', data)
 }
 
 /**
  * 获取用户信息
  */
-export function getUserInfo(): Promise<
-  TApiResponse<ILoginResponse['user']>
-> {
-  return httpClient.get<TApiResponse<ILoginResponse['user']>>(
-    '/api/auth/userInfo'
-  )
+export function getUserInfo(): Promise<AxiosResponse<TApiResponse<ILoginResponse['user']>>> {
+  return httpClient.get<TApiResponse<ILoginResponse['user']>>('/api/auth/userInfo')
 }

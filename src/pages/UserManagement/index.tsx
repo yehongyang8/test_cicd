@@ -56,8 +56,8 @@ export default observer(function UserManagementPage() {
     }
   )
 
-  const dataSource = data?.data?.data?.list || []
-  const total = data?.data?.data?.total || 0
+  const dataSource = data?.data?.data?.data?.list || []
+  const total = data?.data?.data?.data?.total || 0
 
   const handleAdd = () => {
     setEditingUser(null)

@@ -1,14 +1,16 @@
 // 🌐 用户相关 API
 
 import { httpClient } from '../client'
+import type { AxiosResponse } from 'axios'
 import type { IUserInfo, IUserListParams, IUserListResponse } from '@/types'
+import type { ApiResponse } from '../types'
 
 /**
  * 获取用户列表
  */
 export function getUserList(
   params: IUserListParams
-): Promise<IUserListResponse> {
+): Promise<AxiosResponse<IUserListResponse>> {
   return httpClient.get<IUserListResponse>('/api/user/list', { params })
 }
 
@@ -17,12 +19,14 @@ export function getUserList(
  */
 export function createUser(data: {
   username: string
+  password: string
+  realName?: string
   email: string
   phone?: string
   status: number
   roleIds: string[]
-}): Promise<IUserInfo> {
-  return httpClient.post<IUserInfo>('/api/user/save', data)
+}): Promise<AxiosResponse<ApiResponse<IUserInfo>>> {
+  return httpClient.post<ApiResponse<IUserInfo>>('/api/user/save', data)
 }
 
 /**
@@ -35,13 +39,13 @@ export function updateUser(data: {
   phone?: string
   status: number
   roleIds: string[]
-}): Promise<IUserInfo> {
-  return httpClient.post<IUserInfo>('/api/user/update', data)
+}): Promise<AxiosResponse<ApiResponse<IUserInfo>>> {
+  return httpClient.post<ApiResponse<IUserInfo>>('/api/user/update', data)
 }
 
 /**
  * 删除用户
  */
-export function deleteUser(id: string): Promise<void> {
-  return httpClient.post<void>('/api/user/delete', { id })
+export function deleteUser(id: string): Promise<AxiosResponse<ApiResponse>> {
+  return httpClient.post<ApiResponse>('/api/user/delete', { id })
 }

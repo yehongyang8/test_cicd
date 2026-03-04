@@ -28,7 +28,7 @@ export interface ApiRequest {
 const routes: Record<string, any> = {
   // 认证相关
   'POST:/api/auth/login': authController.login,
-  'GET:/api/auth/userInfo': (data: any, userId: string) => authController.getUserInfo(userId),
+  'GET:/api/auth/userInfo': (_data: any, userId: string) => authController.getUserInfo(userId),
 
   // 用户相关
   'GET:/api/user/page': userController.getUserPage,

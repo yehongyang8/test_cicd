@@ -197,7 +197,7 @@ export class BaseCrud<T extends Record<string, any>> {
     const sql = `INSERT INTO ${this.tableName} (${fields.join(', ')}) VALUES (${placeholders})`;
     db.run(sql, values);
 
-    return recordData as T;
+    return recordData as unknown as T;
   }
 
   /**

@@ -73,8 +73,8 @@ export class UserStore {
       // 调用登录 API
       const response = await authApi.login({ username, password: encryptedPassword })
 
-      if (response.data.code === 200 && response.data.data) {
-        const { user, token } = response.data.data
+      if (response.data.data.code === 200 && response.data.data.data) {
+        const { user, token } = response.data.data.data
 
         runInAction(() => {
           // 转换用户数据格式
@@ -101,7 +101,7 @@ export class UserStore {
         runInAction(() => {
           this.isLoading = false
         })
-        return { success: false, message: response.data.message || '登录失败' }
+        return { success: false, message: response.data.data.message || '登录失败' }
       }
     } catch {
       runInAction(() => {

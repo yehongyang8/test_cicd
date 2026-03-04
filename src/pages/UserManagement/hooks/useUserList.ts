@@ -22,8 +22,8 @@ export function useUserList(params: IPaginationParams) {
   )
 
   return {
-    users: data?.data?.data?.list || [],
-    total: data?.data?.data?.total || 0,
+    users: data?.data?.data?.data?.list || [],
+    total: data?.data?.data?.data?.total || 0,
     loading,
     error,
     refresh,

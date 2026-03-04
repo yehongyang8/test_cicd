@@ -13,7 +13,7 @@ export async function initDatabase(): Promise<Database> {
   if (db) return db;
 
   const SQL = await initSqlJs({
-    locateFile: (file) => `https://sql.js.org/dist/${file}`
+    locateFile: (file: any) => `https://sql.js.org/dist/${file}`
   });
 
   db = new SQL.Database();

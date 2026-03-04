@@ -17,6 +17,16 @@ export interface IHttpClientConfig extends AxiosRequestConfig {
 export interface IHttpResponse<T = any> extends AxiosResponse<T> {}
 
 /**
+ * 标准 API 响应格式
+ */
+export interface ApiResponse<T = any> {
+  code: number
+  message: string
+  data?: T
+  timestamp?: number
+}
+
+/**
  * API 错误
  */
 export interface IApiError {
