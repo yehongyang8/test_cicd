@@ -30,11 +30,52 @@ jobs:
       - name: Architecture Check
         run: bash scripts/check-architecture.sh
 
+      # 这部分如果很难处理可以省略
       - name: Lint
         run: pnpm lint
 
+      # 这部分如果很难处理可以省略
       - name: Type Check
         run: tsc -b
 
       - name: Build
         run: pnpm build
+
+      - name: Notify DingTalk
+        if: always()
+        env:
+          DINGTALK_WEBHOOK: ${{ secrets.DINGTALK_WEBHOOK }}
+          DINGTALK_SECRET: ${{ secrets.DINGTALK_SECRET }}
+        run: |
+          # 判断整体结果
+          if [ "${{ job.status }}" = "success" ]; then
+            STATUS_EMOJI="✅"
+            STATUS_TEXT="成功"
+          else
+            STATUS_EMOJI="❌"
+            STATUS_TEXT="失败"
+          fi
+
+          TAG="${{ github.ref_name }}"
+          ACTOR="${{ github.actor }}"
+          REPO="${{ github.repository }}"
+          RUN_URL="${{ github.server_url }}/$REPO/actions/runs/${{ github.run_id }}"
+
+          MSG="### ${STATUS_EMOJI} CI ${STATUS_TEXT} - ${REPO}\n\n"
+          MSG="${MSG}**Tag：** ${TAG}\n\n"
+          MSG="${MSG}**触发人：** ${ACTOR}\n\n"
+          MSG="${MSG}**详情：** [查看 Actions](${RUN_URL})"
+
+          # 生成加签（如果配置了 secret）
+          TIMESTAMP=$(date +%s%3N)
+          if [ -n "$DINGTALK_SECRET" ]; then
+            SIGN=$(printf "%s\n%s" "$TIMESTAMP" "$DINGTALK_SECRET" | openssl dgst -sha256 -hmac "$DINGTALK_SECRET" -binary | base64)
+            SIGN=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$(echo $SIGN | tr -d '\n')'))")
+            WEBHOOK="${DINGTALK_WEBHOOK}&timestamp=${TIMESTAMP}&sign=${SIGN}"
+          else
+            WEBHOOK="$DINGTALK_WEBHOOK"
+          fi
+
+          curl -s -X POST "$WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d "{\"msgtype\":\"markdown\",\"markdown\":{\"title\":\"CI ${STATUS_TEXT}\",\"text\":\"${MSG}\"}}"

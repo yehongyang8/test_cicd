@@ -39,6 +39,9 @@ REQUIRED_DIRS=(
   "src/stores"
   "src/utils"
   "src/routes"
+  "src/servers"
+  "src/servers/apis"
+  "src/locales"
 )
 
 for dir in "${REQUIRED_DIRS[@]}"; do
@@ -54,6 +57,10 @@ REQUIRED_FILES=(
   "src/App.tsx:应用入口组件"
   "src/main.tsx:应用启动入口"
   "src/vite-env.d.ts:Vite 类型声明"
+  "src/servers/client.ts:HTTP 客户端配置"
+  "src/servers/interceptors.ts:请求/响应拦截器"
+  "src/servers/types.ts:API 通用类型"
+  "src/servers/index.ts:API 导出入口"
 )
 
 for entry in "${REQUIRED_FILES[@]}"; do
@@ -177,6 +184,15 @@ if [ -n "$FETCH_USAGE" ]; then
   echo "$FETCH_USAGE" | head -5
 else
   pass "未发现直接使用 fetch"
+fi
+
+# 检查是否有直接 import axios 的地方（应通过 httpClient）
+AXIOS_DIRECT=$(grep -rn "^import axios\|from 'axios'" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | grep -v "src/servers/" || true)
+if [ -n "$AXIOS_DIRECT" ]; then
+  error "不应在业务代码中直接 import axios，请使用 src/servers/client.ts 中封装的 httpClient"
+  echo "$AXIOS_DIRECT" | head -5
+else
+  pass "未发现业务代码直接引用 axios"
 fi
 
 # 检查是否有 console.log 残留

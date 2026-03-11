@@ -1,0 +1,104 @@
+name: Notify Testers on Test Branch
+
+on:
+  push:
+    branches:
+      - test
+  pull_request:
+    types:
+      - closed
+    branches:
+      - test
+
+jobs:
+  notify:
+    # PR 合并时才执行，直接 push 也执行
+    if: github.event_name == 'push' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: Generate Commit Summary
+        id: summary
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          # 获取最近的提交记录
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # PR 合并：获取 PR 中的所有提交
+            COMMITS=$(git log --oneline ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} 2>/dev/null || git log --oneline -20)
+          else
+            # 直接 push：获取本次推送的提交
+            COMMITS=$(git log --oneline ${{ github.event.before }}..${{ github.event.after }} 2>/dev/null || git log --oneline -10)
+          fi
+
+          echo "commits<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMITS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          # 获取变更文件列表
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "无法获取变更文件")
+          echo "changed_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Call OpenAI to Summarize
+        id: ai_summary
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          COMMITS="${{ steps.summary.outputs.commits }}"
+          CHANGED_FILES="${{ steps.summary.outputs.changed_files }}"
+          BRANCH="${{ github.ref_name }}"
+          AUTHOR="${{ github.actor }}"
+
+          PROMPT="你是一个技术文档助手。请根据以下 Git 提交记录和变更文件，整理一份简洁的测试通知文档（中文），包含：1. 本次更新概述 2. 主要变更点 3. 需要重点测试的功能。\n\n提交记录：\n${COMMITS}\n\n变更文件：\n${CHANGED_FILES}"
+
+          RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $OPENAI_API_KEY" \
+            -d "{
+              \"model\": \"gpt-4o-mini\",
+              \"messages\": [{\"role\": \"user\", \"content\": $(echo "$PROMPT" | jq -Rs .)}],
+              \"max_tokens\": 1000
+            }")
+
+          SUMMARY=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // "AI 总结失败，请手动查看提交记录"')
+
+          echo "summary<<EOF" >> $GITHUB_OUTPUT
+          echo "$SUMMARY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Send Email Notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.MAIL_SERVER }}
+          server_port: ${{ secrets.MAIL_PORT }}
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "【测试通知】${{ github.repository }} test 分支有新更新"
+          to: ${{ secrets.TEST_TEAM_EMAILS }}
+          from: ${{ secrets.MAIL_USERNAME }}
+          body: |
+            Hi 测试团队，
+
+            test 分支有新的代码更新，请安排测试。
+
+            ---
+            推送人：${{ github.actor }}
+            分支：${{ github.ref_name }}
+            时间：${{ github.event.head_commit.timestamp }}
+            提交链接：${{ github.server_url }}/${{ github.repository }}/commits/test
+
+            ---
+            📋 AI 变更总结：
+
+            ${{ steps.ai_summary.outputs.summary }}
+
+            ---
+            原始提交记录：
+            ${{ steps.summary.outputs.commits }}
