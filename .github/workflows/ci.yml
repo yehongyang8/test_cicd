@@ -61,21 +61,8 @@ jobs:
           REPO="${{ github.repository }}"
           RUN_URL="${{ github.server_url }}/$REPO/actions/runs/${{ github.run_id }}"
 
-          MSG="### ${STATUS_EMOJI} CI ${STATUS_TEXT} - ${REPO}\n\n"
-          MSG="${MSG}**Tag：** ${TAG}\n\n"
-          MSG="${MSG}**触发人：** ${ACTOR}\n\n"
-          MSG="${MSG}**详情：** [查看 Actions](${RUN_URL})"
+          MSG="${STATUS_EMOJI} CI ${STATUS_TEXT} - ${REPO}\nTag：${TAG}\n触发人：${ACTOR}\n详情：${RUN_URL}"
 
-          # 生成加签（如果配置了 secret）
-          TIMESTAMP=$(date +%s%3N)
-          if [ -n "$DINGTALK_SECRET" ]; then
-            SIGN=$(printf "%s\n%s" "$TIMESTAMP" "$DINGTALK_SECRET" | openssl dgst -sha256 -hmac "$DINGTALK_SECRET" -binary | base64)
-            SIGN=$(python3 -c "import urllib.parse; print(urllib.parse.quote('$(echo $SIGN | tr -d '\n')'))")
-            WEBHOOK="${DINGTALK_WEBHOOK}&timestamp=${TIMESTAMP}&sign=${SIGN}"
-          else
-            WEBHOOK="$DINGTALK_WEBHOOK"
-          fi
-
-          curl -s -X POST "$WEBHOOK" \
+          curl -sf -X POST "$DINGTALK_WEBHOOK" \
             -H "Content-Type: application/json" \
-            -d "{\"msgtype\":\"markdown\",\"markdown\":{\"title\":\"CI ${STATUS_TEXT}\",\"text\":\"${MSG}\"}}"
+            -d "{\"msgtype\":\"text\",\"text\":{\"content\":\"${MSG}\"}}"
