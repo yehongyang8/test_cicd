@@ -45,24 +45,21 @@ jobs:
         if: always()
         env:
           DINGTALK_WEBHOOK: ${{ secrets.DINGTALK_WEBHOOK }}
-          DINGTALK_SECRET: ${{ secrets.DINGTALK_SECRET }}
         run: |
-          # 判断整体结果
           if [ "${{ job.status }}" = "success" ]; then
-            STATUS_EMOJI="✅"
-            STATUS_TEXT="成功"
+            STATUS_TEXT="构建成功 ✅"
           else
-            STATUS_EMOJI="❌"
-            STATUS_TEXT="失败"
+            STATUS_TEXT="构建失败 ❌"
           fi
 
+          REPO="${{ github.repository }}"
           TAG="${{ github.ref_name }}"
           ACTOR="${{ github.actor }}"
-          REPO="${{ github.repository }}"
           RUN_URL="${{ github.server_url }}/$REPO/actions/runs/${{ github.run_id }}"
 
-          MSG="${STATUS_EMOJI} CI ${STATUS_TEXT} - ${REPO}\nTag：${TAG}\n触发人：${ACTOR}\n详情：${RUN_URL}"
+          TITLE="GitHub Actions：${STATUS_TEXT}"
+          TEXT="### GitHub Actions：${STATUS_TEXT}\n\n- **任务：** ${TAG}\n- **状态：** ${STATUS_TEXT}\n- **执行人：** ${ACTOR}\n- **查看详情：** [点击跳转](${RUN_URL})"
 
           curl -sf -X POST "$DINGTALK_WEBHOOK" \
             -H "Content-Type: application/json" \
-            -d "{\"msgtype\":\"text\",\"text\":{\"content\":\"${MSG}\"}}"
+            -d "{\"msgtype\":\"markdown\",\"markdown\":{\"title\":\"${TITLE}\",\"text\":\"${TEXT}\"}}"
