@@ -58,7 +58,7 @@ jobs:
           RUN_URL="${{ github.server_url }}/$REPO/actions/runs/${{ github.run_id }}"
 
           TITLE="GitHub Actions：${STATUS_TEXT}"
-          TEXT="### GitHub Actions：${STATUS_TEXT}\n\n- **任务：** ${TAG}\n- **状态：** ${STATUS_TEXT}\n- **执行人：** ${ACTOR}\n- **查看详情：** [点击跳转](${RUN_URL})"
+          TEXT="### GitHub Actions：${STATUS_TEXT}\n\n\n\n- **任务：** [${TAG}](${RUN_URL})\n- **状态：** ${STATUS_TEXT}\n- **执行人：** [Started by user ${ACTOR}]"
 
           curl -sf -X POST "$DINGTALK_WEBHOOK" \
             -H "Content-Type: application/json" \
